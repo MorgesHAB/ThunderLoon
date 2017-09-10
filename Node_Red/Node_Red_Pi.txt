@@ -1,0 +1,1095 @@
+[
+    {
+        "id": "b277b31.19bd95",
+        "type": "tab",
+        "label": "GPS "
+    },
+    {
+        "id": "5712332c.29d35c",
+        "type": "tab",
+        "label": "Autres"
+    },
+    {
+        "id": "b1338775.c7d0a8",
+        "type": "tab",
+        "label": "LoRa Receiver"
+    },
+    {
+        "id": "bd30920.b702a7",
+        "type": "MySQLdatabase",
+        "z": "",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "Mission3",
+        "tz": ""
+    },
+    {
+        "id": "3736056c.868e8a",
+        "type": "ftp",
+        "z": "",
+        "host": "10.20.20.81",
+        "port": "22",
+        "secureOptions": "",
+        "user": "pi",
+        "connTimeout": "10000",
+        "pasvTimeout": "",
+        "keepalive": ""
+    },
+    {
+        "id": "20b59a5.fd3e966",
+        "type": "file",
+        "z": "b277b31.19bd95",
+        "name": "bibi.txt",
+        "filename": "/home/pi/bibi.txt",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "x": 590.1669235229492,
+        "y": 104.00011825561523,
+        "wires": []
+    },
+    {
+        "id": "61e3f1b9.e921",
+        "type": "gpsd",
+        "z": "b277b31.19bd95",
+        "name": "LoRa GPS",
+        "hostname": "localhost",
+        "port": "2947",
+        "tpv": true,
+        "sky": false,
+        "info": false,
+        "device": false,
+        "gst": false,
+        "att": false,
+        "x": 76.00001525878906,
+        "y": 211.00004386901855,
+        "wires": [
+            [
+                "ff5be8c5.eeb1b8",
+                "7f1afbff.17b304"
+            ]
+        ]
+    },
+    {
+        "id": "7f1afbff.17b304",
+        "type": "trigger",
+        "z": "b277b31.19bd95",
+        "op1": "There's GPS Data at ",
+        "op2": "No GPS !",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "10",
+        "extend": true,
+        "units": "s",
+        "reset": "",
+        "name": "If No GPS",
+        "x": 153.16692352294922,
+        "y": 97.0002326965332,
+        "wires": [
+            [
+                "1f2db671.6fab6a"
+            ]
+        ]
+    },
+    {
+        "id": "ff5be8c5.eeb1b8",
+        "type": "delay",
+        "z": "b277b31.19bd95",
+        "name": "Limit rate",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "15",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 257.1667251586914,
+        "y": 177.00009155273438,
+        "wires": [
+            [
+                "d3278200.4b0bf"
+            ]
+        ]
+    },
+    {
+        "id": "5d0ea041.1d8c4",
+        "type": "rpi-gpio in",
+        "z": "5712332c.29d35c",
+        "name": "",
+        "pin": "22",
+        "intype": "tri",
+        "debounce": "25",
+        "read": false,
+        "x": 112.0000114440918,
+        "y": 46.000006675720215,
+        "wires": [
+            [
+                "f1d77ae3.eb62d8"
+            ]
+        ]
+    },
+    {
+        "id": "f1d77ae3.eb62d8",
+        "type": "debug",
+        "z": "5712332c.29d35c",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 297.0000114440918,
+        "y": 45.000006675720215,
+        "wires": []
+    },
+    {
+        "id": "7d1a3b67.b19f94",
+        "type": "catch",
+        "z": "5712332c.29d35c",
+        "name": "Catch Error",
+        "scope": null,
+        "x": 120.00003051757812,
+        "y": 112.00003433227539,
+        "wires": [
+            [
+                "c79452b7.8a3dc"
+            ]
+        ]
+    },
+    {
+        "id": "c79452b7.8a3dc",
+        "type": "file",
+        "z": "5712332c.29d35c",
+        "name": "Error File",
+        "filename": "/home/pi/Error.txt",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "x": 352.0000228881836,
+        "y": 108.6666612625122,
+        "wires": []
+    },
+    {
+        "id": "c3310b70.7287b8",
+        "type": "exec",
+        "z": "b277b31.19bd95",
+        "command": "sudo /root/SkyLoon/Main_Pi0/LORA_Sender/./chisterapi",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "LoRa Send",
+        "x": 711.1669082641602,
+        "y": 369.1666965484619,
+        "wires": [
+            [
+                "873925fa.381ff8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b928b1d4.82841",
+        "type": "function",
+        "z": "b277b31.19bd95",
+        "name": "Format GPS Data",
+        "func": "longitude = GPSLine[0];\nlatitude = GPSLine[1];\nmsg.topic = \"INSERT INTO mmmmm (latitude, longitude) VALUES(\"+latitude+\",\"+longitude+\");\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 599.8334159851074,
+        "y": 50.333367347717285,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "127152a5.3c2d4d",
+        "type": "inject",
+        "z": "5712332c.29d35c",
+        "name": "Start",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 123.16672134399414,
+        "y": 203.00001621246338,
+        "wires": [
+            [
+                "d1bb3f85.d775f"
+            ]
+        ]
+    },
+    {
+        "id": "24c71d5b.00b722",
+        "type": "exec",
+        "z": "5712332c.29d35c",
+        "command": "vcgencmd measure_temp",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "CPU Temp",
+        "x": 265.1668243408203,
+        "y": 256.5001802444458,
+        "wires": [
+            [
+                "470f5f47.0e817",
+                "96eab6cb.8848a8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6ca26ecc.a1616",
+        "type": "file",
+        "z": "5712332c.29d35c",
+        "name": "",
+        "filename": "/home/pi/Bibi.txt",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "false",
+        "x": 611.1670265197754,
+        "y": 271.0001583099365,
+        "wires": []
+    },
+    {
+        "id": "470f5f47.0e817",
+        "type": "exec",
+        "z": "5712332c.29d35c",
+        "command": "vcgencmd measure_volts",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "CPU Volt",
+        "x": 264.00012588500977,
+        "y": 309.33343601226807,
+        "wires": [
+            [
+                "96eab6cb.8848a8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d1bb3f85.d775f",
+        "type": "exec",
+        "z": "5712332c.29d35c",
+        "command": "date",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Time",
+        "x": 258.00003147125244,
+        "y": 200.66672039031982,
+        "wires": [
+            [
+                "24c71d5b.00b722",
+                "96eab6cb.8848a8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d3278200.4b0bf",
+        "type": "split",
+        "z": "b277b31.19bd95",
+        "name": "",
+        "splt": "\\n",
+        "x": 251.1667022705078,
+        "y": 259.0000352859497,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5ebaab08.52f3d4",
+        "type": "join",
+        "z": "b277b31.19bd95",
+        "name": "",
+        "mode": "custom",
+        "build": "string",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "_",
+        "timeout": "5",
+        "count": "5",
+        "x": 552.0001525878906,
+        "y": 348.0003261566162,
+        "wires": [
+            [
+                "c3310b70.7287b8"
+            ]
+        ]
+    },
+    {
+        "id": "ff3f1cf4.3f33b",
+        "type": "switch",
+        "z": "b277b31.19bd95",
+        "name": "GPS Data",
+        "property": "parts.index",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "4",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "5",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "6",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "7",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "8",
+                "vt": "num"
+            },
+            {
+                "t": "btwn",
+                "v": "4",
+                "vt": "num",
+                "v2": "8",
+                "v2t": "num"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 6,
+        "x": 524.000114440918,
+        "y": 232.66667938232422,
+        "wires": [
+            [
+                "5faa9a4e.ac99c4"
+            ],
+            [
+                "bdc45261.a8d5d"
+            ],
+            [
+                "9893245.22d55d8"
+            ],
+            [
+                "a44c50d8.ad9c1"
+            ],
+            [
+                "73e1a1d0.84e1"
+            ],
+            [
+                "5ebaab08.52f3d4"
+            ]
+        ]
+    },
+    {
+        "id": "fa8d29da.6da818",
+        "type": "inject",
+        "z": "b277b31.19bd95",
+        "name": "",
+        "topic": "",
+        "payload": "{\"class\":\"TPV\",\"tag\":\"RMC\",\"device\":\"/dev/ttyS0\",\"mode\":3,\"time\":\"2017-08-31T14:58:52.000Z\",\"ept\":0.005,\"lat\":46.5215,\"lon\":6.503255,\"alt\":102,\"epv\":23,\"track\":327.88,\"speed\":0.376,\"climb\":0.1,\"epc\":23}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 89.33334350585938,
+        "y": 286.0000171661377,
+        "wires": [
+            [
+                "d3278200.4b0bf"
+            ]
+        ]
+    },
+    {
+        "id": "1f2db671.6fab6a",
+        "type": "debug",
+        "z": "b277b31.19bd95",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 353.3333969116211,
+        "y": 76.0000171661377,
+        "wires": []
+    },
+    {
+        "id": "b4b71c19.b6714",
+        "type": "debug",
+        "z": "5712332c.29d35c",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 604.0004005432129,
+        "y": 234.00009536743164,
+        "wires": []
+    },
+    {
+        "id": "bdc45261.a8d5d",
+        "type": "function",
+        "z": "b277b31.19bd95",
+        "name": "Speed",
+        "func": "msg.topic = \"INSERT INTO Mission3 (Time)\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 714.0004959106445,
+        "y": 192.00005054473877,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4a4ed7bf.21b098",
+        "type": "comment",
+        "z": "b277b31.19bd95",
+        "name": "Base de donnée",
+        "info": "https://www.w3schools.com/sql/sql_insert.asp",
+        "x": 917.1668395996094,
+        "y": 231.00009202957153,
+        "wires": []
+    },
+    {
+        "id": "73e1a1d0.84e1",
+        "type": "function",
+        "z": "b277b31.19bd95",
+        "name": "Altitude",
+        "func": "msg.topic = \"INSERT INTO Mission3 (Time)\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 720.0002479553223,
+        "y": 299.33334159851074,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9893245.22d55d8",
+        "type": "function",
+        "z": "b277b31.19bd95",
+        "name": "Latitude",
+        "func": "msg.topic = \"INSERT INTO Mission3 (Time)\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 716.0004959106445,
+        "y": 229.33334636688232,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5faa9a4e.ac99c4",
+        "type": "function",
+        "z": "b277b31.19bd95",
+        "name": "Time",
+        "func": "msg.topic = \"INSERT INTO Mission3 (Time)\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 716.0003318786621,
+        "y": 155.33334159851074,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a44c50d8.ad9c1",
+        "type": "function",
+        "z": "b277b31.19bd95",
+        "name": "Longitude",
+        "func": "msg.topic = \"INSERT INTO Mission3 (Time)\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 718.0003318786621,
+        "y": 263.3333492279053,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "873925fa.381ff8",
+        "type": "debug",
+        "z": "b277b31.19bd95",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1028.500114440918,
+        "y": 343.3334255218506,
+        "wires": []
+    },
+    {
+        "id": "88febe8e.14d82",
+        "type": "switch",
+        "z": "b277b31.19bd95",
+        "name": "If all GPS Data",
+        "property": "parts.index",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "13",
+                "vt": "num"
+            },
+            {
+                "t": "lt",
+                "v": "13",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 342.0000801086426,
+        "y": 330.00010204315186,
+        "wires": [
+            [],
+            [
+                "c6223f83.3da3c"
+            ]
+        ]
+    },
+    {
+        "id": "c6223f83.3da3c",
+        "type": "file",
+        "z": "b277b31.19bd95",
+        "name": "Error.txt",
+        "filename": "/home/pi/Error.txt",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "false",
+        "x": 529.1666870117188,
+        "y": 427.00000762939453,
+        "wires": []
+    },
+    {
+        "id": "2de4c12.363763e",
+        "type": "inject",
+        "z": "b1338775.c7d0a8",
+        "name": "Start",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 105.16669845581055,
+        "y": 53.000009536743164,
+        "wires": [
+            [
+                "e27e86d7.0e3088"
+            ]
+        ]
+    },
+    {
+        "id": "e27e86d7.0e3088",
+        "type": "exec",
+        "z": "b1338775.c7d0a8",
+        "command": "/home/pi/lora_receiver/./lora_receiever",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Exec LoRa Receiver",
+        "x": 293.1667251586914,
+        "y": 66.50001811981201,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d80efa0b.267788",
+        "type": "split",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "splt": "_",
+        "x": 287.1667137145996,
+        "y": 149.66671562194824,
+        "wires": [
+            [
+                "b3bc91d1.225bf"
+            ]
+        ]
+    },
+    {
+        "id": "ae823934.9727d8",
+        "type": "switch",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": ""
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 135.16677856445312,
+        "y": 426.33335304260254,
+        "wires": [
+            [
+                "9b7d92af.6aede"
+            ]
+        ]
+    },
+    {
+        "id": "9b7d92af.6aede",
+        "type": "join",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "mode": "custom",
+        "build": "string",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": ",",
+        "timeout": "",
+        "count": "3",
+        "x": 311.1667785644531,
+        "y": 388.33335304260254,
+        "wires": [
+            [
+                "c51536cd.0400c8"
+            ]
+        ]
+    },
+    {
+        "id": "c51536cd.0400c8",
+        "type": "file",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "false",
+        "x": 609.1668128967285,
+        "y": 441.6666946411133,
+        "wires": []
+    },
+    {
+        "id": "c9348e2f.a5e6a",
+        "type": "gpsd",
+        "z": "b1338775.c7d0a8",
+        "name": "LoRa GPS",
+        "hostname": "localhost",
+        "port": "2947",
+        "tpv": true,
+        "sky": false,
+        "info": false,
+        "device": false,
+        "gst": false,
+        "att": false,
+        "x": 76.00012588500977,
+        "y": 488.00000762939453,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1763605.642a7a",
+        "type": "delay",
+        "z": "b1338775.c7d0a8",
+        "name": "Limit rate",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "15",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "x": 257.1668357849121,
+        "y": 454.00005531311035,
+        "wires": [
+            [
+                "96013b51.99c9f8"
+            ]
+        ]
+    },
+    {
+        "id": "96013b51.99c9f8",
+        "type": "split",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "splt": "\\n",
+        "x": 251.16681289672852,
+        "y": 535.9999990463257,
+        "wires": [
+            [
+                "5c4bbcff.bb6a24"
+            ]
+        ]
+    },
+    {
+        "id": "a011d828.6d2078",
+        "type": "switch",
+        "z": "b1338775.c7d0a8",
+        "name": "GPS Data",
+        "property": "parts.index",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "4",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "5",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "6",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "7",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "8",
+                "vt": "num"
+            },
+            {
+                "t": "btwn",
+                "v": "4",
+                "vt": "num",
+                "v2": "8",
+                "v2t": "num"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 6,
+        "x": 522.0002365112305,
+        "y": 541.6666450500488,
+        "wires": [
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "780ce6b5.9f1788",
+        "type": "inject",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "topic": "",
+        "payload": ">>Node: 8, Type: 0, Length: 51, Content: 2017-08-31T14:58:52.000Z_0.005_46.5215_6.503255_102",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 149.3333625793457,
+        "y": 146.99999141693115,
+        "wires": [
+            [
+                "d80efa0b.267788"
+            ]
+        ]
+    },
+    {
+        "id": "5c4bbcff.bb6a24",
+        "type": "switch",
+        "z": "b1338775.c7d0a8",
+        "name": "If all GPS Data",
+        "property": "parts.index",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "13",
+                "vt": "num"
+            },
+            {
+                "t": "lt",
+                "v": "13",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 336.0001335144043,
+        "y": 601.0000228881836,
+        "wires": [
+            [
+                "a011d828.6d2078"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "244380e0.164c9",
+        "type": "split",
+        "z": "b277b31.19bd95",
+        "name": "",
+        "splt": "_",
+        "x": 901.333366394043,
+        "y": 400.6666793823242,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "51ceb42e.8eb41c",
+        "type": "join",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "mode": "custom",
+        "build": "string",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": ",",
+        "timeout": "",
+        "count": "2",
+        "x": 567.1667003631592,
+        "y": 142.33342266082764,
+        "wires": [
+            [
+                "4a472fb1.49959"
+            ]
+        ]
+    },
+    {
+        "id": "b3bc91d1.225bf",
+        "type": "switch",
+        "z": "b1338775.c7d0a8",
+        "name": "GPS Data",
+        "property": "parts.index",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "3",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "4",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 3,
+        "x": 422.66670989990234,
+        "y": 148.0001106262207,
+        "wires": [
+            [
+                "51ceb42e.8eb41c"
+            ],
+            [
+                "4a472fb1.49959"
+            ],
+            [
+                "51ceb42e.8eb41c"
+            ]
+        ]
+    },
+    {
+        "id": "bd658eec.5f563",
+        "type": "debug",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 748.5002098083496,
+        "y": 136.66669464111328,
+        "wires": []
+    },
+    {
+        "id": "4a472fb1.49959",
+        "type": "join",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "mode": "custom",
+        "build": "string",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": ",",
+        "timeout": "",
+        "count": "2",
+        "x": 590.0001983642578,
+        "y": 170.0001106262207,
+        "wires": [
+            [
+                "bd658eec.5f563",
+                "cc8c7a33.b01b48"
+            ]
+        ]
+    },
+    {
+        "id": "7e58a1d3.15134",
+        "type": "file",
+        "z": "b1338775.c7d0a8",
+        "name": "KML File",
+        "filename": "/home/pi/lora_receiver/SolarLoon.kml",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "false",
+        "x": 744.6667137145996,
+        "y": 176.0000514984131,
+        "wires": []
+    },
+    {
+        "id": "78108f6f.0d4f1",
+        "type": "exec",
+        "z": "b1338775.c7d0a8",
+        "command": "cp SolarLoon.kml Result/SolarLoon2.kml",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "CP",
+        "x": 807.1667938232422,
+        "y": 245.1667251586914,
+        "wires": [
+            [
+                "a567dea2.e07c8"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a567dea2.e07c8",
+        "type": "exec",
+        "z": "b1338775.c7d0a8",
+        "command": "echo \\n</coordinates>\\n</LineString>\\n</Placemark>\\n</Document>\\n</kml>\\n >> ",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Add",
+        "x": 876.0001354217529,
+        "y": 294.0000591278076,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "96eab6cb.8848a8",
+        "type": "join",
+        "z": "5712332c.29d35c",
+        "name": "",
+        "mode": "custom",
+        "build": "string",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "__",
+        "timeout": "",
+        "count": "3",
+        "x": 441.1666946411133,
+        "y": 243.00003242492676,
+        "wires": [
+            [
+                "b4b71c19.b6714"
+            ]
+        ]
+    },
+    {
+        "id": "cc8c7a33.b01b48",
+        "type": "delay",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 660.5000190734863,
+        "y": 241.66670036315918,
+        "wires": [
+            [
+                "78108f6f.0d4f1"
+            ]
+        ]
+    },
+    {
+        "id": "75183a8a.9813c4",
+        "type": "ftp in",
+        "z": "b1338775.c7d0a8",
+        "ftp": "3736056c.868e8a",
+        "operation": "get",
+        "filename": "/home/pi/titi.txt",
+        "localFilename": "C:\\Users\\disoz\\Desktop\\",
+        "name": "FTP",
+        "x": 1049.5003051757812,
+        "y": 172.00009727478027,
+        "wires": [
+            [
+                "558d8552.18b99c"
+            ]
+        ]
+    },
+    {
+        "id": "e75b8631.4077a8",
+        "type": "inject",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 947.1667213439941,
+        "y": 101.0000057220459,
+        "wires": [
+            [
+                "75183a8a.9813c4"
+            ]
+        ]
+    },
+    {
+        "id": "558d8552.18b99c",
+        "type": "debug",
+        "z": "b1338775.c7d0a8",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1205.1666870117188,
+        "y": 211.33334350585938,
+        "wires": []
+    }
+]
